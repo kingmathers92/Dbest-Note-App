@@ -9,8 +9,9 @@ export default function Header() {
         <img className="navbar--logo" src={Logo} alt="logo" />
       </Link>
       <NavLink to="/">Home</NavLink>
-      <NavLink to="notes">Notes</NavLink>
-      <NavLink to="contact">Contact</NavLink>
+      <NavLink to="/notes">Notes</NavLink>
+      <NavLink to="/contact">Contact</NavLink>
+      <NavLink to="/profile">Profile</NavLink>
     </header>
   );
 }

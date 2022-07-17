@@ -1,0 +1,57 @@
+.signup--container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Handlee", cursive;
+  }
+  .signup--submit {
+    width: 80px;
+    height: 25px;
+    font-family: "Handlee", cursive;
+    align-self: center;
+    margin-top: 10px;
+    border-radius: 6px;
+  }
+  .signup--container h1 {
+    font-size: 2.5rem;
+  }
+  .signup-post-it {
+    width: 400px;
+    height: 400px;
+    background-color: #feff9c;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 20px;
+    border-style: none;
+    border-radius: 2px;
+    border-bottom: #bdbf6c 8px solid;
+    border-right: #bdbf6c 2px solid;
+  }
+  .signup--container  > label {
+    margin-top: 10px;
+  }
+  .signup--container  > input {
+    background-color: #eff266;
+    font-family: "Handlee", cursive;
+    border-style: none;
+    border-radius: 6px;
+    text-indent: 6px;
+  }
+  .signup--container form > textarea {
+    background-color: #eff266;
+    border-style: none;
+    border-radius: 6px;
+    text-indent: 6px;
+  }
+  .asterisk {
+    color: red;
+  }
+  .instructions {
+    color: grey;
+    font-size: 0.7rem ;
+  }
+  input {
+    background-color: #eff266;
+    border-style: none;
+  }

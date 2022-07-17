@@ -4,8 +4,34 @@ import { React, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Split from "react-split";
 import { nanoid } from "nanoid";
+import { db } from "../../firebase-config";
+//import { useAuth } from "../../context/Auth";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  setDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+} from "firebase/firestore";
 
 export default function Notes() {
+  //const { currentUser } = useAuth();
+  const notesRef = collection(db, "notes");
+  const orderedNotes = query(notesRef, orderBy("createdAt", "desc"));
+
+  useEffect(() => {
+    onSnapshot(orderedNotes, async () => {
+      const data = await getDocs(orderedNotes);
+      const notesArray = data.docs.map((doc) => doc.data());
+      setNotes(notesArray);
+    });
+  }, [orderedNotes]);
+
   const [notes, setNotes] = useState(
     () => JSON.parse(localStorage.getItem("notes")) || []
   );
@@ -20,54 +46,60 @@ export default function Notes() {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes]);
 
-  function getDateString() {
-    const date = new Date();
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return `${
-      months[date.getMonth()]
-    } ${date.getDate()}, ${date.getFullYear()}`;
-  }
+  // function getDateString() {
+  //   const date = new Date();
+  //   const months = [
+  //     "Jan",
+  //     "Feb",
+  //     "Mar",
+  //     "Apr",
+  //     "May",
+  //     "Jun",
+  //     "Jul",
+  //     "Aug",
+  //     "Sep",
+  //     "Oct",
+  //     "Nov",
+  //     "Dec",
+  //   ];
+  //   return `${
+  //     months[date.getMonth()]
+  //   } ${date.getDate()}, ${date.getFullYear()}`;
+  // }
 
-  function createNewNote() {
-    const newNote = {
-      id: nanoid(),
-      body: "Write a note..",
-      date: getDateString(),
+  const createNewNote = async () => {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
     };
-    setNotes((prevNotes) => [newNote, ...prevNotes]);
+    const date = new Date();
+    const id = nanoid();
+    const newNote = {
+      id: id,
+      title: `New Note ${notes.length + 1}`,
+      body: "Compose an epic...",
+      date: `${new Intl.DateTimeFormat("en-US", options).format(date)}`,
+      createdAt: serverTimestamp(),
+    };
+    await setDoc(doc(db, "notes", id), newNote);
     setCurrentNoteId(newNote.id);
-    navigate(`/notes/${newNote.id}`);
-  }
+  };
 
-  function updateNote(text) {
-    setNotes((prev) => {
-      let index = prev.findIndex((elem) => elem.id === currentNoteId);
-      let updatedNote = { ...prev[index], body: text };
-      let newNotes = [...prev];
-      newNotes.splice(index, 1);
-      newNotes.unshift(updatedNote);
-      return newNotes;
-    });
-  }
+  const updateNote = async (text) => {
+    const userDoc = doc(db, "notes", currentNoteId);
+    const update =
+      typeof text === "string" ? { body: text } : { title: text.target.value };
+    await updateDoc(userDoc, update);
+  };
 
-  function deleteNote(event, noteId, noteIndex, nextId) {
+  const deleteNote = async (event, noteId) => {
     event.stopPropagation();
-    setNotes((prev) => prev.filter((elem) => elem.id != noteId));
-    navigate(`/notes/${nextId}`);
-  }
+    const userDoc = doc(db, "notes", noteId);
+    await deleteDoc(userDoc);
+  };
 
   function findCurrentNote() {
     return (
